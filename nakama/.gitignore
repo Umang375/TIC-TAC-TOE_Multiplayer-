@@ -1,0 +1,32 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+nakama_logs.txt
+
+# Node
+node_modules/
+
+# TypeScript compiled outputs
+build/
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+*.tsbuildinfo
+!rollup.config.mjs
+
+# Nakama data and environment config
+data/
+*.db
+local.yml
+.env
+.env.local
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store

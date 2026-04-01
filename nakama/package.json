@@ -1,0 +1,19 @@
+{
+  "name": "tic-tac-toe-nakama",
+  "version": "1.0.0",
+  "description": "Nakama server module for multiplayer Tic-Tac-Toe",
+  "scripts": {
+    "build": "npx rollup -c",
+    "type-check": "npx tsc --noEmit"
+  },
+  "devDependencies": {
+    "nakama-common": "https://github.com/heroiclabs/nakama-common",
+    "typescript": "^5.3.3",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "rollup": "^4.9.6",
+    "tslib": "^2.6.2"
+  }
+}
