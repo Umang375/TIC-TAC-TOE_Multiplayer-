@@ -30,6 +30,7 @@ This project strictly adheres to a client-server architecture where the server a
 ### Start the Backend
 Spin up the PostgreSQL database and the Nakama server.
 ```bash
+# From the root of the project
 docker-compose up --build -d
 ```
 *   **Healthcheck:** `GET http://localhost:7350/healthcheck`
