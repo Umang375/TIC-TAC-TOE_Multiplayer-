@@ -45,13 +45,22 @@ This guide covers deploying the Nakama backend to an **AWS EC2** instance and th
 | Custom TCP | 7351 | 0.0.0.0/0 | Nakama Console      |
 
 4. Download your key pair (`.pem` file) and launch.
-5. **Assign an Elastic IP** to the instance for a stable address.
+5. **Assign an Elastic IP** for a stable address:
+   - Go to **Network & Security** > **Elastic IPs** in the left sidebar.
+   - Click **Allocate Elastic IP address** → **Allocate**.
+   - Select the new IP → **Actions** → **Associate Elastic IP address**.
+   - Select your **Instance** from the list and click **Associate**.
+   - *Note: This prevents your server IP from changing if the instance restarts.*
+
+> [!TIP]
+> **Public vs. Private IP:**
+> Always use the **Public (Elastic) IP** for SSH from your local computer. The **Private IP** (`172.31.x.x`) is only for communication *inside* AWS (e.g., if you had another server in the same account). To use a Private IP from your own machine, you would need a VPN or AWS Direct Connect.
 
 ### 1.2 Connect and Install Prerequisites
 
 ```bash
-# Connect to your instance
-ssh -i your-key.pem ubuntu@<YOUR_EC2_IP>
+# Connect to your instance (Use the Public / Elastic IP address)
+ssh -i your-key.pem ubuntu@<YOUR_PUBLIC_EC2_IP>
 
 # Update system
 sudo apt update && sudo apt upgrade -y
@@ -100,7 +109,7 @@ services:
     image: postgres:12.2-alpine
     environment:
       - POSTGRES_DB=nakama
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-your_strong_password_here}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-********}
     volumes:
       - pgdata:/var/lib/postgresql/data
     expose:
@@ -124,8 +133,8 @@ services:
         /nakama/nakama migrate up --database.address postgres:${POSTGRES_PASSWORD:-your_strong_password_here}@postgres:5432/nakama?sslmode=disable &&
         exec /nakama/nakama
         --config /nakama/data/local.yml
-        --database.address postgres:${POSTGRES_PASSWORD:-your_strong_password_here}@postgres:5432/nakama?sslmode=disable
-        --socket.server_key ${NAKAMA_SERVER_KEY:-defaultkey}
+        --database.address postgres:${POSTGRES_PASSWORD:-********}@postgres:5432/nakama?sslmode=disable
+        --socket.server_key ${NAKAMA_SERVER_KEY:-********}
     depends_on:
       postgres:
         condition: service_healthy
@@ -149,8 +158,8 @@ Create the `.env` file:
 
 ```bash
 cat > .env << 'EOF'
-POSTGRES_PASSWORD=change_me_to_a_strong_password
-NAKAMA_SERVER_KEY=change_me_to_a_random_key
+POSTGRES_PASSWORD=********
+NAKAMA_SERVER_KEY=********
 EOF
 
 chmod 600 .env
@@ -171,16 +180,21 @@ curl http://localhost:7350/healthcheck
 
 ### 1.6 Set Up SSL with Nginx + Let's Encrypt
 
-You need a domain name pointing to your EC2 Elastic IP (e.g., `nakama.yourdomain.com`).
+You need a domain name pointing to your EC2 Elastic IP to generate an SSL certificate.
+
+> [!TIP]
+> **Free Domain Alternative:** If you don't want to buy a domain right now, you can use **nip.io**, a free wildcard DNS service. Just take your Elastic IP and append `.nip.io` to it. 
+> For example: if your IP is `12.34.56.78`, your free domain is exactly `12.34.56.78.nip.io`. You don't need to sign up for anything—it works instantly!
 
 ```bash
 # Install Nginx and Certbot
 sudo apt install -y nginx certbot python3-certbot-nginx
 
 # Create Nginx config
-sudo cat > /etc/nginx/sites-available/nakama << 'EOF'
+sudo tee /etc/nginx/sites-available/nakama > /dev/null << 'EOF'
 server {
     listen 80;
+    # Replace the below with your domain or your IP.nip.io (e.g., 12.34.56.78.nip.io)
     server_name nakama.yourdomain.com;
 
     location / {
@@ -210,7 +224,7 @@ sudo rm -f /etc/nginx/sites-enabled/default
 sudo nginx -t
 sudo systemctl restart nginx
 
-# Get SSL certificate
+# Get SSL certificate (Make sure to replace the domain here too!)
 sudo certbot --nginx -d nakama.yourdomain.com --non-interactive --agree-tos -m your@email.com
 
 # Auto-renew
@@ -228,7 +242,7 @@ Create `frontend/.env.production`:
 ```env
 VITE_NAKAMA_HOST=nakama.yourdomain.com
 VITE_NAKAMA_PORT=443
-VITE_NAKAMA_KEY=your_server_key_here
+VITE_NAKAMA_KEY=********
 VITE_NAKAMA_USE_SSL=true
 ```
 
@@ -277,8 +291,8 @@ vercel --prod
 | Variable | Value |
 |---|---|
 | `VITE_NAKAMA_HOST` | `nakama.yourdomain.com` |
-| `VITE_NAKAMA_PORT` | `443` |
-| `VITE_NAKAMA_KEY` | Your server key |
+| `VITE_NAKAMA_PORT` | `503` |
+| `VITE_NAKAMA_KEY` | `********` |
 | `VITE_NAKAMA_USE_SSL` | `true` |
 
 6. Click **Deploy**
@@ -362,6 +376,7 @@ curl https://nakama.yourdomain.com/healthcheck
 
 | Issue | Solution |
 |---|---|
+| SSH: Connection refused | 1. Check Security Group: Ensure Port 22 is open for your IP.<br>2. Try **EC2 Instance Connect** in AWS Console to verify the server is up.<br>3. Verify hostname is `ubuntu@<IP>`. |
 | WebSocket connection fails | Check Nginx upgrade headers, ensure ports 443/7350 are open |
 | CORS errors | Update `local.yml` with proper CORS settings |
 | Database connection error | Check PostgreSQL is healthy: `docker-compose logs postgres` |
