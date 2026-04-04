@@ -251,7 +251,7 @@ function matchLoop(
     if (now >= s.turnDeadline) {
       // Current player forfeits due to timeout
       s.gameOver = true;
-      const otherPlayer = s.playerOrder.find(id => id !== s.currentTurn);
+      const otherPlayer = s.playerOrder.filter(id => id !== s.currentTurn)[0];
       if (otherPlayer) {
         s.winner = otherPlayer;
         const doneMessage = JSON.stringify({
@@ -361,7 +361,7 @@ function matchLoop(
     }
 
     // Switch turns
-    s.currentTurn = s.playerOrder.find(id => id !== senderId) || s.currentTurn;
+    s.currentTurn = s.playerOrder.filter(id => id !== senderId)[0] || s.currentTurn;
 
     // Reset timer for the new turn
     if (s.timedMode) {

@@ -18,10 +18,11 @@ function findMatchRpc(
   const timedMode = request.timedMode || false;
 
   // First, try to find an existing open match
-  const matches = nk.matchList(10, true, null, null, 1, JSON.stringify({
+  const label = JSON.stringify({
     open: 1,
     timed_mode: timedMode,
-  }));
+  });
+  const matches = nk.matchList(10, true, label, 0, 1, "");
 
   if (matches && matches.length > 0) {
     // Join the first available match
@@ -79,7 +80,7 @@ function onMatchmakerMatched(
   // Check if timed mode was requested (from string properties)
   let timedMode = false;
   for (const entry of entries) {
-    if (entry.properties && entry.properties.stringProperties && entry.properties.stringProperties['mode'] === 'timed') {
+    if (entry.properties && entry.properties['mode'] === 'timed') {
       timedMode = true;
       break;
     }

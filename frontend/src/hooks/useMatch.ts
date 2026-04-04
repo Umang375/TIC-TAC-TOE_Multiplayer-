@@ -207,8 +207,10 @@ export function useMatch(
         }
       }
     } catch (err) {
-      console.error('Failed to find match:', err);
-      setIsSearching(false);
+      console.error('Failed to find match via RPC:', err);
+      if (!matchmakerTicketRef.current) {
+        setIsSearching(false);
+      }
     }
   }, [socket, session]);
 
