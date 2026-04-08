@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { useNakama } from './hooks/useNakama';
 import { useMatch } from './hooks/useMatch';
 import { Home } from './pages/Home';
@@ -15,31 +16,37 @@ function App() {
   // Show loading screen while connecting
   if (isLoading) {
     return (
-      <div className="page" style={{ justifyContent: 'center', alignItems: 'center', gap: 'var(--space-xl)' }}>
-        <div className="loading-spinner" style={{ width: 60, height: 60 }} />
-        <p style={{ color: 'var(--text-secondary)', animation: 'pulse 1.5s ease-in-out infinite' }}>
-          Connecting to server...
-        </p>
-      </div>
+      <>
+        <div className="page" style={{ justifyContent: 'center', alignItems: 'center', gap: 'var(--space-xl)' }}>
+          <div className="loading-spinner" style={{ width: 60, height: 60 }} />
+          <p style={{ color: 'var(--text-secondary)', animation: 'pulse 1.5s ease-in-out infinite' }}>
+            Connecting to server...
+          </p>
+        </div>
+        <Analytics />
+      </>
     );
   }
 
   // Show error screen
   if (error) {
     return (
-      <div className="page" style={{ justifyContent: 'center', alignItems: 'center', gap: 'var(--space-xl)' }}>
-        <div style={{ fontSize: '3rem' }}>😵</div>
-        <h2 className="heading-md" style={{ color: 'var(--accent-magenta)' }}>Connection Failed</h2>
-        <p style={{ color: 'var(--text-secondary)', textAlign: 'center', maxWidth: 400 }}>
-          {error}
-        </p>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', maxWidth: 400 }}>
-          Make sure the Nakama server is running on localhost:7350
-        </p>
-        <button className="btn btn-primary" onClick={() => window.location.reload()} id="retry-connection">
-          🔄 Retry
-        </button>
-      </div>
+      <>
+        <div className="page" style={{ justifyContent: 'center', alignItems: 'center', gap: 'var(--space-xl)' }}>
+          <div style={{ fontSize: '3rem' }}>😵</div>
+          <h2 className="heading-md" style={{ color: 'var(--accent-magenta)' }}>Connection Failed</h2>
+          <p style={{ color: 'var(--text-secondary)', textAlign: 'center', maxWidth: 400 }}>
+            {error}
+          </p>
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', maxWidth: 400 }}>
+            Make sure the Nakama server is running on localhost:7350
+          </p>
+          <button className="btn btn-primary" onClick={() => window.location.reload()} id="retry-connection">
+            🔄 Retry
+          </button>
+        </div>
+        <Analytics />
+      </>
     );
   }
 
@@ -78,6 +85,7 @@ function App() {
           onLeave={() => { match.leaveMatch(); setPage('home'); }}
           onPlayAgain={() => { match.resetMatch(); setPage('home'); }}
         />
+        <Analytics />
       </>
     );
   }
@@ -104,6 +112,7 @@ function App() {
           session={session}
           onBack={() => setPage('home')}
         />
+        <Analytics />
       </>
     );
   }
@@ -142,6 +151,7 @@ function App() {
         onJoinMatch={match.joinMatch}
         isSearching={match.isSearching}
       />
+      <Analytics />
     </>
   );
 }
