@@ -1,0 +1,29 @@
+server:
+  port: 3000
+
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:nakama}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:change_me}
+    driver-class-name: org.postgresql.Driver
+    # HikariCP Connection Pool Configurations
+    hikari:
+      pool-name: TicTacToeHikariPool
+      maximum-pool-size: 15
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 20000
+      max-lifetime: 1800000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+app:
+  jwt:
+    secret: 9a4f2c8d3b7a1e5f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6y7z8a9b0c1d
+    expiration-ms: 86400000

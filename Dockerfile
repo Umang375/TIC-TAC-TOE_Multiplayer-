@@ -10,6 +10,7 @@ RUN npm install
 # Copy source files and build
 COPY nakama/src ./src
 COPY nakama/tsconfig.json ./
+
 COPY nakama/rollup.config.mjs ./
 RUN npx rollup -c
 
