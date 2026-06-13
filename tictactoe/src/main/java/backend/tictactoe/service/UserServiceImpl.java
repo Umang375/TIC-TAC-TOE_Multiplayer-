@@ -51,6 +51,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
+    public void incrementWins(UUID userId) {
+        User user = getUserById(userId);
+        user.setWins(user.getWins() + 1);
+        userRepository.save(user);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         // Handled via custom device authentication; basic username loading is not used.
         return null;

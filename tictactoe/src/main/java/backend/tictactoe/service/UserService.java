@@ -13,4 +13,6 @@ public interface UserService {
     User updateDisplayName(UUID userId, String displayName);
 
     List<User> getLeaderboard(int limit);
+
+    void incrementWins(UUID userId);
 }
